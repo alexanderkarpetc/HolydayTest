@@ -10,6 +10,7 @@ public class Translator {
         { "totalBananaClicks",      new List<string>(){ "Total bananas clicked", "Всего нажатых бананов" } },
         { "totalBananaUpgrades",    new List<string>(){ "Total banana upgrades", "Общее количество улучшений бананов" } },
         { "currentLanguage",        new List<string>(){ "Current Language", "Выбранный язык" } },
+        { "bananaRush",             new List<string>(){ "Banana Rush", "Банановая лихорадка" } },
     };
     public static string GetTranslation(string term) {
         return localizationTerms[term][GameEntities.LanguageController.CurrentLanguage];

@@ -10,6 +10,8 @@ public class GameController : MonoBehaviour {
 
     public const string canvasPath = "canvas/";
     public const string menusPath = canvasPath + "menus/";
+    public const float bananaRushCooldown = 10;
+    public const float bananaRushSpawnDuration = 3;
 
     [Serializable]
     public class UIData {
@@ -29,6 +31,9 @@ public class GameController : MonoBehaviour {
     private const int spawnPosModifier = 200;
     private int bananaProgress;
     private Vector2 previousScreenSize;
+    private Button bananaRushButton;
+    private Image bananaRushCooldownImage;
+    private List<Transform> _rushBananas = new List<Transform>();
 
     public void Start() {
         foreach (UIData menuPrefab in menuPrefabs) {
@@ -73,6 +78,8 @@ public class GameController : MonoBehaviour {
                     Destroy(hitGameObject);
                 }
             }
+
+            UpdateRushBananas();
         }
 
         var currentScreenSize = new Vector2(Screen.width, Screen.height);
@@ -115,7 +122,13 @@ public class GameController : MonoBehaviour {
         GameObject.Find(menusPath + "upgrades/upgrade (1)/upgradeButton").SetActive(!GameEntities.Upgrades.CheckIfUpgradeMaxed(Upgrade.BananaSpawnTime));
         GameObject.Find(menusPath + "upgrades/upgrade (1)/upgradeButton/upgradeCost/quantity").GetComponent<TextMeshProUGUI>().text = GameEntities.Upgrades.GetUpgradeCost(Upgrade.BananaSpawnTime).ToString();
         GameObject.Find(menusPath + "upgrades/upgrade (1)/upgradeResult/quantity").GetComponent<TextMeshProUGUI>().text = "-" + GameEntities.Upgrades.GetUpgradeEffect(Upgrade.BananaSpawnTime);
-
+        bananaRushButton = GameObject.Find(canvasPath + "bananaRush/button").GetComponent<Button>();
+        bananaRushCooldownImage = GameObject.Find(canvasPath + "bananaRush/button/cooldown").GetComponent<Image>();
+        bananaRushButton.onClick.AddListener(() => {
+            StartCoroutine(StartBananaRush());
+            StartCoroutine(StartBananaRushCooldown());
+        });
+        
         bananaPrefab = transform.Find("banana").gameObject;
 
         GameEntities.BananaController.SetSpawnTime();
@@ -160,6 +173,50 @@ public class GameController : MonoBehaviour {
         Debug.LogError("This Menu Does Not Exist");
         
         return false;
+    }
+        
+    private void UpdateRushBananas()
+    {
+        // move down and rotate bananas
+        foreach (var banana in _rushBananas)
+        {
+            if(banana == null) continue;
+            banana.position += Vector3.down * Time.deltaTime * 5;
+            banana.Rotate(Vector3.forward, 5);
+        }
+    }
+
+    private IEnumerator StartBananaRush() {
+        var timeLeft = bananaRushSpawnDuration;
+        while (timeLeft > 0) {
+            bananaRushCooldownImage.fillAmount = timeLeft / bananaRushCooldown;
+            var randomInterval = UnityEngine.Random.Range(0.1f, 0.2f);
+            timeLeft -= randomInterval;
+            yield return new WaitForSeconds(randomInterval);
+            var newBanana = Instantiate(bananaPrefab,
+                new Vector2(UnityEngine.Random.Range(bananaSpawnEdges.x, bananaSpawnEdges.z), bananaSpawnEdges.w),
+                Quaternion.identity, null);
+            newBanana.SetActive(true);
+            _rushBananas.Add(newBanana.transform);
+        }
+    }
+
+    private IEnumerator StartBananaRushCooldown() {
+        bananaRushButton.interactable = false;
+        bananaRushCooldownImage.fillAmount = 1;
+        var timeLeft = bananaRushCooldown;
+        while (timeLeft > 0) {
+            timeLeft -= Time.deltaTime;
+            bananaRushCooldownImage.fillAmount = timeLeft / bananaRushCooldown;
+            yield return null;
+        }
+        bananaRushButton.interactable = true;
+        _rushBananas.ForEach(x=>
+        {
+            if (x != null)
+                Destroy(x.gameObject);
+        });
+        _rushBananas.Clear();
     }
 }
 

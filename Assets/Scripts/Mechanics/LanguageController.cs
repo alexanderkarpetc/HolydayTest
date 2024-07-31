@@ -10,6 +10,7 @@ public class LanguageController
         private set
         {
             currentLanguage = value;
+            GameObject.Find(GameController.canvasPath + "bananaRush/label").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("bananaRush");
         } 
     }
 
