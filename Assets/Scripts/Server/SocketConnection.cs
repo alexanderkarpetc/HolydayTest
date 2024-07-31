@@ -24,7 +24,7 @@ public class SocketConnection {
     private bool isConnectedToSocket = false;
 
     //credentials
-    private const string userID = "jLgluRhMym";
+    private const string userID = "b3TmoHaZex";
     private const string gameID = "HolydayStudiosTest";
     private const string socketUri = "wss://ws-test.holydaygames.org:7351";
 
@@ -49,7 +49,7 @@ public class SocketConnection {
 
             isConnectedToSocket = true;
 
-            GetUserData(false);
+            GetUserData(true);
 
             GameEntities.GameController.StartCoroutine(ReceiveMessages());
         }
@@ -123,7 +123,15 @@ public class SocketConnection {
                 if (int.TryParse(data.Data[1], out int gold)) {
                     GameEntities.GoldController.SetGold(gold);
                 }
-
+                if (int.TryParse(data.Data[2], out int languageIndex)) {
+                    GameEntities.LanguageController.SetLanguage(languageIndex);
+                }
+                var achievementList = JsonHelper.CreateFromJson<AchievementList>(data.Data[3]);
+                foreach (var achievement in achievementList.list)
+                {
+                    GameEntities.Achievements.achievementProgress[achievement.code] = achievement.number;
+                }
+                
                 GameEntities.GameController.OnUserDataSet();
             }
         }
@@ -154,6 +162,21 @@ public class SocketConnection {
     /// <param name="message"></param>
     public void BananaUpgrade(Upgrade Upgrade) {
         SendSocketMessage(ComposeSocketMessage(FunctionsSent.Upgrade.ToString(), ((int)Upgrade).ToString()));
+    }
+    /// <summary>
+    /// Change language
+    /// </summary>
+    /// <param name="message"></param>
+    public void ChangeLanguage(int languageIndex) {
+        SendSocketMessage(ComposeSocketMessage(FunctionsSent.ChangeLanguage.ToString(), languageIndex.ToString()));
+    }
+    
+    /// <summary>
+    /// Set the achievement progress
+    /// </summary>
+    /// <param name="message"></param>
+    public void AddAchievementProgress(int achievementIndex, int progress) {
+        SendSocketMessage(ComposeSocketMessage(FunctionsSent.AddAchievementProgress.ToString(), achievementIndex.ToString(), progress.ToString()));
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +12,7 @@ public class GoldController
         private set
         {
             currentGold = value;
-
+            GameObject.Find(GameController.canvasPath + "counter/quantity").GetComponent<TextMeshProUGUI>().text = currentGold.ToString();
             GameObject.Find(GameController.menusPath + "upgrades/upgrade (0)/upgradeButton").GetComponent<Button>().interactable =
                 currentGold >= GameEntities.Upgrades.GetUpgradeCost(Upgrade.BananaGold);
             GameObject.Find(GameController.menusPath + "upgrades/upgrade (1)/upgradeButton").GetComponent<Button>().interactable =
@@ -24,13 +25,21 @@ public class GoldController
     }
 
     public void AddGold() {
-        int goldGained = startingBananaGold + (int)GameEntities.Upgrades.GetUpgradeEffect(Upgrade.BananaGold);
-        CurrentGold += goldGained;
+        var goldGainedFromUpdates = startingBananaGold + (int)GameEntities.Upgrades.GetUpgradeEffect(Upgrade.BananaGold);
+        var goldGainedFromMilestones = GameEntities.Achievements.GetBonusGold();
+        CurrentGold += goldGainedFromUpdates;
+        CurrentGold += goldGainedFromMilestones;
+        GameEntities.SocketConnection.GetGold();
     }
 
     public void RemoveGold(int Gold) {
         if (Gold > 0) { 
             CurrentGold -= Gold;
         }
+    }
+
+    public void SendProgress(int bananaProgress)
+    {
+        GameEntities.SocketConnection.AddAchievementProgress((int)Achievement.BananasClicked, bananaProgress);
     }
 }

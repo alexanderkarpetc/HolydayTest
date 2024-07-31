@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public class Achievements {
 
@@ -74,9 +75,45 @@ public class Achievements {
         { Achievement.BananasClicked,       bananaClicks },
         { Achievement.BananaUpgrades,       bananaUpgrades },
     };
+
+    public Dictionary<Achievement, int> achievementProgress = new Dictionary<Achievement, int>()
+    {
+        {Achievement.BananasClicked, 0},
+        {Achievement.BananaUpgrades, 0},
+    };
+
+    public int GetBonusGold()
+    {
+        var bonusGold = 0;
+        var index = 0;
+        while(achievementProgress[Achievement.BananasClicked] >= bananaClicks[index] && index < bananaClicks.Count)
+        {
+            bonusGold += bananaGoldIncreasePerMilestone;
+            index++;
+        }
+        index = 0;
+        while(achievementProgress[Achievement.BananaUpgrades] >= bananaUpgrades[index] && index < bananaUpgrades.Count)
+        {
+            bonusGold += bananaGoldIncreasePerMilestone;
+            index++;
+        }
+        
+        return bonusGold;
+    }
 }
 
 public enum Achievement { 
     BananasClicked,
     BananaUpgrades
+}
+
+[Serializable]
+public class AchievementList {
+    public List<AchievementServer> list = new List<AchievementServer>();
+}
+
+[Serializable]
+public class AchievementServer {
+    public Achievement code;
+    public int number;
 }

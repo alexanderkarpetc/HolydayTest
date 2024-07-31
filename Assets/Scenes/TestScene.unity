@@ -204,6 +204,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1603953756}
     m_Modifications:
+    - target: {fileID: 301392852711113789, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2261260680305517142, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
       propertyPath: m_Pivot.x
       value: 1
@@ -230,7 +234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2261260680305517142, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 220
+      value: 194.68
       objectReference: {fileID: 0}
     - target: {fileID: 2261260680305517142, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
       propertyPath: m_SizeDelta.y
@@ -266,7 +270,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2261260680305517142, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -88
+      value: -113.32001
       objectReference: {fileID: 0}
     - target: {fileID: 2261260680305517142, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -284,9 +288,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4170783464081409666, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 5740194050452876760, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
       propertyPath: m_Name
       value: counter
+      objectReference: {fileID: 0}
+    - target: {fileID: 5740194050452876760, guid: e9c02ff081c97cc44b03a3a869b04503, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -329,7 +341,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuPrefabs:
   - menu: 0
-    prefab: {fileID: 0}
+    prefab: {fileID: 7248416947590498666, guid: 314891a8406f0004cb70d2ab1f848ce8, type: 3}
+    hasInitialized: 0
+  - menu: 1
+    prefab: {fileID: 7248416947590498666, guid: 5796fa3edff2c3c4ebaf7a69c5b4d77c, type: 3}
     hasInitialized: 0
 --- !u!4 &213128446
 Transform:
@@ -890,8 +905,8 @@ SpriteRenderer:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_DrawMode: 2
+  m_Size: {x: 100, y: 100}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -906,8 +921,8 @@ Transform:
   m_GameObject: {fileID: 818051532}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.4674752, y: -5, z: 0}
-  m_LocalScale: {x: 20, y: 20, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

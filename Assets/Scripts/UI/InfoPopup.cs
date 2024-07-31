@@ -1,13 +1,12 @@
 ﻿using DG.Tweening;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InfoPopup {
 
     #region Fields
-    private const string menuPath = GameController.menusPath + "infoPopup";
-
     private Button infoCloseButton;
     private Button infoBackgroundClose;
     private GameObject infoPopUp;
@@ -19,25 +18,27 @@ public class InfoPopup {
     #endregion
 
     #region Initialize
-    public void Initialize() {
+    public void Initialize(GameObject popupGo) {
+        infoPopUp = popupGo;
+        infoPopUpRect = popupGo.transform.Find("bg").GetComponent<RectTransform>();
 
-        infoPopUp = GameObject.Find(menuPath);
-        infoPopUpRect = GameObject.Find(menuPath + "/bg").GetComponent<RectTransform>();
+        infoCloseButton = popupGo.transform.Find("bg/closeButton").GetComponent<Button>();
+        infoCloseButton.onClick.AddListener(ClosePopup);
 
-        infoCloseButton = GameObject.Find(menuPath + "/bg/closeButton").GetComponent<Button>();
-        infoCloseButton.onClick.AddListener(() => {
-            ClosePopup();
-        });
-
-        infoBackgroundClose = GameObject.Find(menuPath + "/background").GetComponent<Button>();
-        infoBackgroundClose.onClick.AddListener(() => {
-            ClosePopup();
-        });
+        infoBackgroundClose = popupGo.transform.Find("background").GetComponent<Button>();
+        infoBackgroundClose.onClick.AddListener(ClosePopup);
     }
     #endregion
 
     public void OpenPopup() {
         GameEntities.GameController.StartCoroutine(GameEntities.GameController.InitializeMenu(MenuName.InfoPopup, Initialize, OpenPopupActions));
+        SetTexts();
+    }
+    public void SetTexts() {
+        infoPopUp.transform.Find("bg/title").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("howTheGameWorks");
+        infoPopUp.transform.Find("bg/content/generalInfo").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("generalInfo");
+        infoPopUp.transform.Find("bg/content/upgradeInfo").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("upgradeInfo");
+        infoPopUp.transform.Find("bg/content/progressInfo").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("progressInfo");
     }
 
     private void OpenPopupActions() {

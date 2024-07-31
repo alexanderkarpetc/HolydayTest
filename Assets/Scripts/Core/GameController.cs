@@ -27,25 +27,37 @@ public class GameController : MonoBehaviour {
     private GameObject bananaPrefab;
     private Vector4 bananaSpawnEdges = Vector4.zero;
     private const int spawnPosModifier = 200;
+    private int bananaProgress;
+    private Vector2 previousScreenSize;
 
     public void Start() {
-        
         foreach (UIData menuPrefab in menuPrefabs) {
             allUI.Add(menuPrefab);
         }
 
-        Vector3 minPosition = Camera.main.ScreenToWorldPoint(new Vector3(spawnPosModifier, spawnPosModifier));
-        Vector3 maxPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width - spawnPosModifier, Screen.height - spawnPosModifier));
+        RecalculateBananaSpawnPlaces();
 
-        bananaSpawnEdges = new Vector4(minPosition.x, minPosition.y, maxPosition.x, maxPosition.y);
+        previousScreenSize = new Vector2(Screen.width, Screen.height);
 
         StartCoroutine(GameEntities.SocketConnection.ConnectToSocket());
+    }
+
+    private void RecalculateBananaSpawnPlaces()
+    {
+        var minPosition = Camera.main.ScreenToWorldPoint(new Vector3(spawnPosModifier, spawnPosModifier));
+        var maxPosition = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width - spawnPosModifier, Screen.height - spawnPosModifier));
+
+        bananaSpawnEdges = new Vector4(minPosition.x, minPosition.y, maxPosition.x, maxPosition.y);
     }
 
     public void Update() {
         if (gameInitialised) { 
 
             GameEntities.BananaController.UpdateSpawnTime(); 
+            if(bananaProgress >= 10) {
+                GameEntities.GoldController.SendProgress(bananaProgress);
+                bananaProgress = 0;
+            }
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -56,9 +68,24 @@ public class GameController : MonoBehaviour {
                 {
                     GameObject hitGameObject = hit.collider.gameObject; //banana game object
                     GameEntities.GoldController.AddGold();
+                    bananaProgress++;
                     Destroy(hitGameObject);
                 }
             }
+        }
+
+        var currentScreenSize = new Vector2(Screen.width, Screen.height);
+        if (currentScreenSize != previousScreenSize) {
+            RecalculateBananaSpawnPlaces();
+            previousScreenSize = currentScreenSize;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (bananaProgress > 0)
+        {
+            GameEntities.GoldController.SendProgress(bananaProgress);
         }
     }
 
@@ -67,6 +94,10 @@ public class GameController : MonoBehaviour {
         GameObject.Find(canvasPath + "infoButton").GetComponent<Button>().onClick.AddListener(() => {
             GameEntities.InfoPopup.OpenPopup();
         });
+        GameObject.Find(canvasPath + "playerAvatar").GetComponent<Button>().onClick.AddListener(() => {
+            GameEntities.AchievementsPopup.OpenPopup();
+        });
+        GameObject.Find(canvasPath + "counter/quantity").GetComponent<TextMeshProUGUI>().text = GameEntities.GoldController.CurrentGold.ToString();
 
         GameObject.Find(menusPath + "upgrades/upgrade (0)/upgradeButton").GetComponent<Button>().onClick.AddListener(() => {
             GameEntities.Upgrades.PerformUpgrade(Upgrade.BananaGold);
@@ -96,15 +127,15 @@ public class GameController : MonoBehaviour {
         newBanana.SetActive(true);
     }
 
-    public IEnumerator InitializeMenu(MenuName MenuName, Action Initialize, Action Open, Action OnInitializeComplete = null) {
+    public IEnumerator InitializeMenu(MenuName MenuName, Action<GameObject> Initialize, Action Open, Action OnInitializeComplete = null) {
 
         UIData menu = allUI.SingleOrDefault(x => x.menu == MenuName);
 
         if (menu != null) {
 
             if (!menu.hasInitialized) {
-
-                Initialize?.Invoke();
+                var newMenu = Instantiate(menu.prefab, GameObject.Find(menusPath).transform);
+                Initialize?.Invoke(newMenu);
 
                 yield return null;
 
@@ -122,7 +153,6 @@ public class GameController : MonoBehaviour {
         UIData menu = allUI.SingleOrDefault(x => x.menu == MenuName);
 
         if (menu != null) {
-
             return menu.hasInitialized;
         }
 
@@ -134,4 +164,5 @@ public class GameController : MonoBehaviour {
 
 public enum MenuName {
     InfoPopup = 0,
+    AchievementsPopup = 1,
 }

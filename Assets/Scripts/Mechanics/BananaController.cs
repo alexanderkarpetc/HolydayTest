@@ -23,6 +23,6 @@ public class BananaController
 
     public void SetSpawnTime() {
         double spawnTime = maxSpawnTime - GameEntities.Upgrades.GetUpgradeEffect(Upgrade.BananaSpawnTime);
-        SpawnTimeLeft = spawnTime;
+        SpawnTimeLeft = 0.1;
     }
 }
