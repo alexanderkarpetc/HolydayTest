@@ -21,6 +21,7 @@ public class Upgrades {
             if (CheckIfUpgradeMaxed(Upgrade)) {
                 GameObject.Find(GameController.menusPath + "upgrades/upgrade (" + (int)Upgrade + ")/upgradeButton").SetActive(false);
             }
+            GameEntities.Achievements.UpgradeMade();
         } 
     }
 

@@ -68,6 +68,7 @@ public class GameController : MonoBehaviour {
                 {
                     GameObject hitGameObject = hit.collider.gameObject; //banana game object
                     GameEntities.GoldController.AddGold();
+                    GameEntities.Achievements.BananaClicked();
                     bananaProgress++;
                     Destroy(hitGameObject);
                 }

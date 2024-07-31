@@ -16,8 +16,9 @@ public class AchievementsPopup {
     private RectTransform totalBananasClickedProgress;
     private TextMeshProUGUI totalBananaUpgraded;
     private RectTransform totalBananasUpgradedProgress;
-    private TextMeshProUGUI bananaIncome;
-
+    private TextMeshProUGUI bananaIncomePerClicks;
+    private TextMeshProUGUI bananaIncomePerUpgrades;
+    private float initialMaskWidth;
     public bool achievementsMenuIsOpen;
 
     private float animationDuration = 0.3f;
@@ -33,13 +34,24 @@ public class AchievementsPopup {
 
         achievementsBackgroundClose = popupGo.transform.Find("background").GetComponent<Button>();
         achievementsBackgroundClose.onClick.AddListener(ClosePopup);
+        InitProgressElems(popupGo);
+        InitLanguage(popupGo);
+    }
+
+    private void InitProgressElems(GameObject popupGo)
+    {
         totalBananasClicked = popupGo.transform.Find("bg/totalBananas/progress/progressText").GetComponent<TextMeshProUGUI>();
-        totalBananasClicked.text = "0/32";
+        bananaIncomePerClicks = popupGo.transform.Find("bg/totalBananas/bananasIncome/incomeText").GetComponent<TextMeshProUGUI>();
         totalBananasClickedProgress = popupGo.transform.Find("bg/totalBananas/progress/Mask").GetComponent<RectTransform>();
+        initialMaskWidth = totalBananasClickedProgress.sizeDelta.x;
+        
         totalBananaUpgraded = popupGo.transform.Find("bg/totalUpgrades/progress/progressText").GetComponent<TextMeshProUGUI>();
-        totalBananaUpgraded.text = "0/33";
         totalBananasUpgradedProgress = popupGo.transform.Find("bg/totalUpgrades/progress/Mask").GetComponent<RectTransform>();
-        bananaIncome = popupGo.transform.Find("bg/totalBananas/bananasIncome/incomeText").GetComponent<TextMeshProUGUI>();
+        bananaIncomePerUpgrades = popupGo.transform.Find("bg/totalUpgrades/bananasIncome/incomeText").GetComponent<TextMeshProUGUI>();
+    }
+
+    private void InitLanguage(GameObject popupGo)
+    {
         languageToggleGroup = popupGo.transform.Find("bg/languageChange/Options").GetComponent<ToggleGroup>();
         SelectToggle(GameEntities.LanguageController.CurrentLanguage);
         foreach (var toggle in languageToggleGroup.GetComponentsInChildren<Toggle>())
@@ -52,6 +64,7 @@ public class AchievementsPopup {
             });
         }
     }
+
     #endregion
     public void SelectToggle(int language)
     {
@@ -67,9 +80,51 @@ public class AchievementsPopup {
 
     public void OpenPopup() {
         GameEntities.GameController.StartCoroutine(GameEntities.GameController.InitializeMenu(MenuName.AchievementsPopup, Initialize, OpenPopupActions));
+        SetProgress();
         SetTexts();
     }
-    
+
+    private void SetProgress()
+    {
+        var clickMilestoneBonus = 0;
+        var bananaClicks = GameEntities.Achievements.achievementProgress[Achievement.BananasClicked];
+
+        var nextMilestone = Achievements.achievementMilestones[Achievement.BananasClicked][0];
+
+        foreach (var milestone in Achievements.achievementMilestones[Achievement.BananasClicked])
+        {
+            clickMilestoneBonus++;
+
+            if (bananaClicks < milestone)
+            {
+                nextMilestone = milestone;
+                break;
+            }
+        }
+        totalBananasClicked.text = $"{bananaClicks}/{nextMilestone}";
+        bananaIncomePerClicks.text = $"+{clickMilestoneBonus}";
+        totalBananasClickedProgress.sizeDelta = new Vector2(initialMaskWidth * (bananaClicks / (float)nextMilestone), totalBananasClickedProgress.sizeDelta.y);
+        
+        var upgradeMilestoneBonus = 0;
+        var bananaUpgrades = GameEntities.Achievements.achievementProgress[Achievement.BananaUpgrades];
+
+        var nextUpgradeMilestone = Achievements.achievementMilestones[Achievement.BananaUpgrades][0];
+
+        foreach (var milestone in Achievements.achievementMilestones[Achievement.BananaUpgrades])
+        {
+            upgradeMilestoneBonus++;
+
+            if (bananaUpgrades < milestone)
+            {
+                nextUpgradeMilestone = milestone;
+                break;
+            }
+        }
+        totalBananaUpgraded.text = $"{bananaUpgrades}/{nextUpgradeMilestone}";
+        bananaIncomePerUpgrades.text = $"+{upgradeMilestoneBonus}";
+        totalBananasUpgradedProgress.sizeDelta = new Vector2(initialMaskWidth * (bananaUpgrades / (float)nextUpgradeMilestone), totalBananasUpgradedProgress.sizeDelta.y);
+    }
+
     public void SetTexts() {
         achievementsPopUp.transform.Find("bg/totalBananas/title").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("totalBananaClicks");
         achievementsPopUp.transform.Find("bg/totalUpgrades/title").GetComponent<TextMeshProUGUI>().text = Translator.GetTranslation("totalBananaUpgrades");

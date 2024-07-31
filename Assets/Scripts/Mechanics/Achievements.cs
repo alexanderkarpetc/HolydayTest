@@ -100,6 +100,15 @@ public class Achievements {
         
         return bonusGold;
     }
+
+    public void BananaClicked()
+    {
+        achievementProgress[Achievement.BananasClicked]++;
+    }
+    public void UpgradeMade()
+    {
+        achievementProgress[Achievement.BananaUpgrades]++;
+    }
 }
 
 public enum Achievement { 
